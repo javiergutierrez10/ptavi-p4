@@ -20,22 +20,30 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         handle method of the server class
         (all requests will be handled by this method)
         """
-        self.wfile.write(b"Hemos recibido tu peticion")
-        for line in self.rfile:
-            ip_cliente = self.client_address[0]
-            puerto_cliente = self.client_address[1]
-            print("El cliente con IP:" + str(ip_cliente) + " y Puerto:" + 
-            str(puerto_cliente) + " nos manda", line.decode('utf-8'))
-            
+        self.wfile.write(b"SIP/2.0 200 OK\r\n\r\n")
+        line = self.rfile.read()
+        mensaje = line.decode('utf-8')
+        expires = int(mensaje.split(' ')[3])
+        ip_cliente = self.client_address[0]
+        puerto_cliente = self.client_address[1]
+        print("El cliente con IP:" + str(ip_cliente) + " y Puerto:" + str(puerto_cliente) + " nos manda", mensaje)
+        
+        
         if line.decode('utf-8').split(' ')[0] == "REGISTER":
             name_cliente = line.decode('utf-8').split(' ')[1]
-            for nombre in clientes:
-                if name_cliente == nombre:
-                    print("ERRORRR")
+            if len(self.clientes) == 0 and expires != 0:
+                self.clientes[name_cliente] = ip_cliente
+            elif len(self.clientes) != 0:
+                for nombre in self.clientes:
+                    if name_cliente == nombre and expires != 0:
+                        print("El cliente ya está registrado\r\n")
+                    elif name_cliente == nombre and expires == 0: 
+                        del self.clientes[name_cliente]
+                        
+                    elif name_cliente != nombre and expires != 0:     
+                        self.clientes[name_cliente] = ip_cliente
                     
-            clientes[name_cliente] = ip_cliente
-                    
-            print(clientes)
+            print(self.clientes)
 
 if __name__ == "__main__":
     # Listens at localhost ('') port 6001 
