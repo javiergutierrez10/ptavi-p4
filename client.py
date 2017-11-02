@@ -13,8 +13,9 @@ try:
     PORT = int(sys.argv[2])
     SIP_NAME = sys.argv[4]
     EXPIRES = int(sys.argv[5])
-    LINE = "REGISTER sip:" + SIP_NAME + " SIP/2.0\r\nExpires: " + str(EXPIRES) + "\r\n\r\n"
-    
+    LINE = "REGISTER sip:" + SIP_NAME + " SIP/2.0\r\nExpires: "
+    LINE = LINE + str(EXPIRES) + "\r\n\r\n"
+
 except ValueError:
     sys.exit("Error: El puerto y el expires deben ser enteros")
 except IndexError:
